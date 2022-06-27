@@ -23,9 +23,9 @@ func main() {
 
 	log.Println("Using port:", listener.Addr().(*net.TCPAddr).Port)
 
-	panic(http.Serve(listener, nil))
+	http.Serve(listener, nil)
 
-	//http.ListenAndServe(":0", nil) - commented out as it is not used anymore
+	//http.ListenAndServe(":0", nil)
 
 }
 
