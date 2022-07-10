@@ -24,6 +24,7 @@ var contacts = []contact{
 func main() {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
+	Start()
 	api.HandleFunc("/contacts", getAllContacts).Methods("GET")
 	api.HandleFunc("/contacts/{id}", getContact).Methods("GET")
 	api.HandleFunc("/contacts", createContact).Methods("POST")
