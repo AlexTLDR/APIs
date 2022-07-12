@@ -23,12 +23,11 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
-	// See "Important settings" section.
 	db.SetConnMaxLifetime(time.Minute * 3)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
 
-	/*check db connection*/
+	/* check db connection */
 	err = db.Ping()
 	if err != nil {
 		panic(err)
@@ -36,7 +35,7 @@ func Start() {
 		fmt.Println("connection to db successful")
 	}
 
-	/**/
+	/* select * query */
 	rows, err := db.Query("select * from Contacts where ID = ?", 1)
 	if err != nil {
 		log.Fatal(err)
@@ -53,4 +52,5 @@ func Start() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 }
