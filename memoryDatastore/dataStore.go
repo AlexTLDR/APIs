@@ -53,4 +53,19 @@ func Start() {
 		log.Fatal(err)
 	}
 
+	/* insert query*/
+
+	res, err := db.Exec("INSERT INTO Contacts(ID,Name,Mail) VALUES(?,?,?)", 2, "John", "john@mail.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+	lastId, err := res.LastInsertId()
+	if err != nil {
+		log.Fatal(err)
+	}
+	rowCnt, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
 }
