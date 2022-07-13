@@ -53,6 +53,16 @@ func Start() {
 		log.Fatal(err)
 	}
 
+	// err = db.QueryRowContext(ctx, "SELECT Name, Mail from Contacts WHERE ID = ?", 2).Scan(&Name, &Mail)
+	// switch {
+	// case err == sql.ErrNoRows:
+	// 	log.Printf("no user with id %d\n", ID)
+	// case err != nil:
+	// 	log.Fatalf("query error: %v\n", err)
+	// default:
+	// 	log.Printf("name is %q and mail is %q\n", Name, Mail)
+	// }
+
 	/* insert query*/
 
 	res, err := db.Exec("INSERT INTO Contacts(ID,Name,Mail) VALUES(?,?,?)", 2, "John", "john@mail.com")
