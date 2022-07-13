@@ -36,7 +36,7 @@ func Start() {
 	}
 
 	/* select * query */
-	rows, err := db.Query("select * from Contacts where ID = ?", 1)
+	rows, err := db.Query("select * from Contacts where ID = ?", 2)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,4 +68,26 @@ func Start() {
 		log.Fatal(err)
 	}
 	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
+
+	/* update query*/
+
+	res, err = db.Exec("UPDATE Contacts set Name =?,Mail =? where ID =?", "Johnny", "john@mail.com", 2)
+	if err != nil {
+		log.Fatal(err)
+	}
+	lastId, err = res.LastInsertId()
+	if err != nil {
+		log.Fatal(err)
+	}
+	rowCnt, err = res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("ID = %d, affected = %d\n", lastId, rowCnt)
+
+	/* delete query */
+	_, err = db.Exec("delete from Contacts where ID = ?", 5)
+	if err != nil {
+		panic(err)
+	}
 }
