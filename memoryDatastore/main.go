@@ -15,34 +15,39 @@ type contact struct {
 	Mail string `json:"Mail"`
 }
 
-var contacts = []contact{
-	{ID: "1", Name: "Alex B", Mail: "foo@protonmail.com"},
-	{ID: "2", Name: "Alex Test", Mail: "bar@gmail.com"},
-	{ID: "3", Name: "Foo", Mail: "foo@gmail.com"},
+// var contacts = []contact{
+// 	{ID: "1", Name: "Alex B", Mail: "foo@protonmail.com"},
+// 	{ID: "2", Name: "Alex Test", Mail: "bar@gmail.com"},
+// 	{ID: "3", Name: "Foo", Mail: "foo@gmail.com"},
+// }
+
+type server struct {
+	contacts []contact
 }
 
 func main() {
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
-	Start()
-	api.HandleFunc("/contacts", getAllContacts).Methods("GET")
-	api.HandleFunc("/contacts/{id}", getContact).Methods("GET")
-	api.HandleFunc("/contacts", createContact).Methods("POST")
-	api.HandleFunc("/contacts/{id}", updateContact).Methods("PUT")
-	api.HandleFunc("/contacts/{id}", deleteContact).Methods("DELETE")
+	s := server{}
+	//Start()
+	api.HandleFunc("/contacts", s.getAllContacts).Methods("GET")
+	api.HandleFunc("/contacts/{id}", s.getContact).Methods("GET")
+	api.HandleFunc("/contacts", s.createContact).Methods("POST")
+	api.HandleFunc("/contacts/{id}", s.updateContact).Methods("PUT")
+	api.HandleFunc("/contacts/{id}", s.deleteContact).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8081", r))
 }
 
-func getAllContacts(w http.ResponseWriter, r *http.Request) {
+func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(contacts)
+	json.NewEncoder(w).Encode(s.contacts)
 	w.WriteHeader(http.StatusOK)
 }
 
-func getContact(w http.ResponseWriter, r *http.Request) {
+func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for _, article := range contacts {
+	for _, article := range s.contacts {
 		if article.ID == params["id"] {
 			json.NewEncoder(w).Encode(article)
 			return
@@ -52,27 +57,27 @@ func getContact(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func createContact(w http.ResponseWriter, r *http.Request) {
+func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var newContact contact
 	_ = json.NewDecoder(r.Body).Decode(&newContact)
-	contacts = append(contacts, newContact)
+	s.contacts = append(s.contacts, newContact)
 	json.NewEncoder(w).Encode(newContact)
 	w.WriteHeader(http.StatusCreated)
 	fmt.Fprint(w, `{"success": "contact created"}`)
 }
 
-func updateContact(w http.ResponseWriter, r *http.Request) {
+func (s *server) updateContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var updatedContact contact
 	_ = json.NewDecoder(r.Body).Decode(&updatedContact)
 	params := mux.Vars(r)
-	for i, contact := range contacts {
+	for i, contact := range s.contacts {
 		if contact.ID == params["id"] {
 			updatedContact.ID = params["id"]
 			contact.Name = updatedContact.Name
 			contact.Mail = updatedContact.Mail
-			contacts = append(contacts[:i], updatedContact)
+			s.contacts = append(s.contacts[:i], updatedContact)
 			json.NewEncoder(w).Encode(updatedContact)
 			w.WriteHeader(http.StatusAccepted)
 			fmt.Fprint(w, `{"success": "contact updated"}`)
@@ -81,12 +86,12 @@ func updateContact(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func deleteContact(w http.ResponseWriter, r *http.Request) {
+func (s *server) deleteContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for i, contact := range contacts {
+	for i, contact := range s.contacts {
 		if contact.ID == params["id"] {
-			contacts = append(contacts[:i], contacts[i+1:]...)
+			s.contacts = append(s.contacts[:i], s.contacts[i+1:]...)
 		}
 	}
 	json.NewEncoder(w).Encode(&contact{})

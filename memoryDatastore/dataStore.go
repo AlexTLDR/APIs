@@ -11,7 +11,6 @@ import (
 )
 
 var (
-	ctx  context.Context
 	db   *sql.DB
 	ID   int
 	Name string
@@ -19,6 +18,7 @@ var (
 )
 
 func Start() {
+	ctx := context.Background()
 	db, err := sql.Open("mysql", "root:123456@tcp(127.0.01:3308)/testapp")
 	if err != nil {
 		panic(err)
@@ -53,15 +53,15 @@ func Start() {
 		log.Fatal(err)
 	}
 
-	// err = db.QueryRowContext(ctx, "SELECT Name, Mail from Contacts WHERE ID = ?", 2).Scan(&Name, &Mail)
-	// switch {
-	// case err == sql.ErrNoRows:
-	// 	log.Printf("no user with id %d\n", ID)
-	// case err != nil:
-	// 	log.Fatalf("query error: %v\n", err)
-	// default:
-	// 	log.Printf("name is %q and mail is %q\n", Name, Mail)
-	// }
+	err = db.QueryRowContext(ctx, "SELECT Name, Mail from Contacts WHERE ID = 1").Scan(&Name, &Mail)
+	switch {
+	case err == sql.ErrNoRows:
+		log.Printf("no user with id %d\n", ID)
+	case err != nil:
+		log.Fatalf("query error: %v\n", err)
+	default:
+		log.Printf("name is %q and mail is %q\n", Name, Mail)
+	}
 
 	/* insert query*/
 
