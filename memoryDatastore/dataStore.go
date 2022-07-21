@@ -10,12 +10,12 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var (
-	db   *sql.DB
-	ID   int
-	Name string
-	Mail string
-)
+// var (
+// 	db   *sql.DB
+// 	ID   int
+// 	Name string
+// 	Mail string
+// )
 
 func Start() {
 	ctx := context.Background()
@@ -53,7 +53,7 @@ func Start() {
 		log.Fatal(err)
 	}
 
-	err = db.QueryRowContext(ctx, "SELECT Name, Mail from Contacts WHERE ID = 1").Scan(&Name, &Mail)
+	err = db.QueryRowContext(ctx, "SELECT Name, Mail from Contacts WHERE ID = ?", 1).Scan(&Name, &Mail)
 	switch {
 	case err == sql.ErrNoRows:
 		log.Printf("no user with id %d\n", ID)

@@ -1,19 +1,26 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
-type contact struct {
+type Contact struct {
 	ID   string `json:"ID"`
 	Name string `json:"Name"`
 	Mail string `json:"Mail"`
 }
+
+var (
+	db  *sql.DB
+	err error
+)
 
 // var contacts = []contact{
 // 	{ID: "1", Name: "Alex B", Mail: "foo@protonmail.com"},
@@ -22,14 +29,31 @@ type contact struct {
 // }
 
 type server struct {
-	contacts []contact
+	contacts []Contact
 }
 
 func main() {
+
+	db, err := sql.Open("mysql", "root:123456@tcp(127.0.01:3308)/testapp")
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	/* check db connection */
+	err = db.Ping()
+	if err != nil {
+		panic(err)
+	} else {
+		fmt.Println("connection to db successful")
+	}
+
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
 	s := server{}
 	//Start()
+
 	api.HandleFunc("/contacts", s.getAllContacts).Methods("GET")
 	api.HandleFunc("/contacts/{id}", s.getContact).Methods("GET")
 	api.HandleFunc("/contacts", s.createContact).Methods("POST")
@@ -39,9 +63,27 @@ func main() {
 }
 
 func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(s.contacts)
-	w.WriteHeader(http.StatusOK)
+	// w.Header().Set("Content-Type", "application/json")
+	// json.NewEncoder(w).Encode(s.contacts)
+	// w.WriteHeader(http.StatusOK)
+	var contacts []Contact
+
+	result, err := db.Query("select * from Contacts")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	defer result.Close()
+
+	for result.Next() {
+		var contact Contact
+		err := result.Scan(&contact.ID, &contact.Name, &contact.Mail)
+		if err != nil {
+			panic(err.Error())
+		}
+		contacts = append(contacts, contact)
+		json.NewEncoder(w).Encode(contacts)
+	}
 }
 
 func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
@@ -53,13 +95,13 @@ func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	json.NewEncoder(w).Encode(&contact{})
+	json.NewEncoder(w).Encode(&Contact{})
 	w.WriteHeader(http.StatusOK)
 }
 
 func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var newContact contact
+	var newContact Contact
 	_ = json.NewDecoder(r.Body).Decode(&newContact)
 	s.contacts = append(s.contacts, newContact)
 	json.NewEncoder(w).Encode(newContact)
@@ -69,7 +111,7 @@ func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) updateContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var updatedContact contact
+	var updatedContact Contact
 	_ = json.NewDecoder(r.Body).Decode(&updatedContact)
 	params := mux.Vars(r)
 	for i, contact := range s.contacts {
@@ -94,6 +136,6 @@ func (s *server) deleteContact(w http.ResponseWriter, r *http.Request) {
 			s.contacts = append(s.contacts[:i], s.contacts[i+1:]...)
 		}
 	}
-	json.NewEncoder(w).Encode(&contact{})
+	json.NewEncoder(w).Encode(&Contact{})
 	w.WriteHeader(http.StatusOK)
 }
