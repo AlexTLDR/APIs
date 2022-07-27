@@ -136,22 +136,26 @@ func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) updateContact(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var updatedContact Contact
-	_ = json.NewDecoder(r.Body).Decode(&updatedContact)
 	params := mux.Vars(r)
-	for i, contact := range s.contacts {
-		if contact.ID == params["id"] {
-			updatedContact.ID = params["id"]
-			contact.Name = updatedContact.Name
-			contact.Mail = updatedContact.Mail
-			s.contacts = append(s.contacts[:i], updatedContact)
-			json.NewEncoder(w).Encode(updatedContact)
-			w.WriteHeader(http.StatusAccepted)
-			fmt.Fprint(w, `{"success": "contact updated"}`)
 
-		}
+	query, err := s.db.Prepare("update Contacts set name = ? where ID =?")
+	if err != nil {
+		panic(err.Error())
 	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	keyVal := make(map[string]string)
+	json.Unmarshal(body, &keyVal)
+	newName := keyVal["Name"]
+	_, err = query.Exec(newName, params["id"])
+	if err != nil {
+		panic(err.Error())
+	}
+	fmt.Fprintf(w, "Contact with ID = %s was updated", params["id"])
 }
 
 func (s *server) deleteContact(w http.ResponseWriter, r *http.Request) {
