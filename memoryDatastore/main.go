@@ -138,7 +138,7 @@ func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
 func (s *server) updateContact(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	query, err := s.db.Prepare("update Contacts set name = ? where ID =?")
+	query, err := s.db.Prepare("update Contacts set Mail = ? where ID =?")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -150,8 +150,8 @@ func (s *server) updateContact(w http.ResponseWriter, r *http.Request) {
 
 	keyVal := make(map[string]string)
 	json.Unmarshal(body, &keyVal)
-	newName := keyVal["Name"]
-	_, err = query.Exec(newName, params["id"])
+	newMail := keyVal["Mail"]
+	_, err = query.Exec(newMail, params["id"])
 	if err != nil {
 		panic(err.Error())
 	}
@@ -159,13 +159,17 @@ func (s *server) updateContact(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) deleteContact(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for i, contact := range s.contacts {
-		if contact.ID == params["id"] {
-			s.contacts = append(s.contacts[:i], s.contacts[i+1:]...)
-		}
+
+	query, err := s.db.Prepare("delete from Contacts where id = ?")
+	if err != nil {
+		panic(err.Error())
 	}
-	json.NewEncoder(w).Encode(&Contact{})
-	w.WriteHeader(http.StatusOK)
+
+	_, err = query.Exec(params["id"])
+	if err != nil {
+		panic(err.Error())
+	}
+
+	fmt.Fprintf(w, "Post with ID = %s was deleted", params["id"])
 }
