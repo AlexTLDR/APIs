@@ -17,10 +17,10 @@ type Contact struct {
 	Mail string `json:"Mail"`
 }
 
-var (
-	db  *sql.DB
-	err error
-)
+// var (
+// 	db  *sql.DB
+// 	err error
+// )
 
 // var contacts = []contact{
 // 	{ID: "1", Name: "Alex B", Mail: "foo@protonmail.com"},
@@ -30,6 +30,7 @@ var (
 
 type server struct {
 	contacts []Contact
+	db       *sql.DB
 }
 
 func main() {
@@ -51,7 +52,9 @@ func main() {
 
 	r := mux.NewRouter()
 	api := r.PathPrefix("/api").Subrouter()
-	s := server{}
+	s := server{
+		db: db,
+	}
 	//Start()
 
 	api.HandleFunc("/contacts", s.getAllContacts).Methods("GET")
@@ -59,7 +62,11 @@ func main() {
 	api.HandleFunc("/contacts", s.createContact).Methods("POST")
 	api.HandleFunc("/contacts/{id}", s.updateContact).Methods("PUT")
 	api.HandleFunc("/contacts/{id}", s.deleteContact).Methods("DELETE")
+	//New functions to add regarding photo manipulation
+	//api.HandleFunc("/photos", s.addPhoto).Methods("POST")
+	//api.HandleFunc("/photos", s.deletePhoto).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8081", r))
+
 }
 
 func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +75,7 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 	// w.WriteHeader(http.StatusOK)
 	var contacts []Contact
 
-	result, err := db.Query("select * from Contacts")
+	result, err := s.db.Query("select * from Contacts")
 	if err != nil {
 		panic(err.Error())
 	}
