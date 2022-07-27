@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -112,12 +113,25 @@ func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	var newContact Contact
-	_ = json.NewDecoder(r.Body).Decode(&newContact)
-	s.contacts = append(s.contacts, newContact)
-	json.NewEncoder(w).Encode(newContact)
-	w.WriteHeader(http.StatusCreated)
+	query, err := s.db.Prepare("insert into Contacts (ID, Name, Mail) VALUES(?,?,?) ")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	keyVal := make(map[string]string)
+	json.Unmarshal(body, &keyVal)
+	ID := keyVal["ID"]
+	Name := keyVal["Name"]
+	Mail := keyVal["Mail"]
+	_, err = query.Exec(ID, Name, Mail)
+	if err != nil {
+		panic(err.Error())
+	}
 	fmt.Fprint(w, `{"success": "contact created"}`)
 }
 
