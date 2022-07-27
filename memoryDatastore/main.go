@@ -70,9 +70,7 @@ func main() {
 }
 
 func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
-	// w.Header().Set("Content-Type", "application/json")
-	// json.NewEncoder(w).Encode(s.contacts)
-	// w.WriteHeader(http.StatusOK)
+
 	var contacts []Contact
 
 	result, err := s.db.Query("select * from Contacts")
@@ -96,14 +94,21 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	for _, article := range s.contacts {
-		if article.ID == params["id"] {
-			json.NewEncoder(w).Encode(article)
-			return
+	result, err := s.db.Query("select * from Contacts where ID=?", params["id"])
+	if err != nil {
+		panic(err.Error())
+	}
+	defer result.Close()
+
+	var contact Contact
+	for result.Next() {
+		err := result.Scan(&contact.ID, &contact.Name, &contact.Mail)
+		if err != nil {
+			panic(err.Error())
 		}
 	}
-	json.NewEncoder(w).Encode(&Contact{})
-	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(contact)
+
 }
 
 func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
