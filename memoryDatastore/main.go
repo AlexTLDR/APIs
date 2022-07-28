@@ -18,17 +18,6 @@ type Contact struct {
 	Mail string `json:"Mail"`
 }
 
-// var (
-// 	db  *sql.DB
-// 	err error
-// )
-
-// var contacts = []contact{
-// 	{ID: "1", Name: "Alex B", Mail: "foo@protonmail.com"},
-// 	{ID: "2", Name: "Alex Test", Mail: "bar@gmail.com"},
-// 	{ID: "3", Name: "Foo", Mail: "foo@gmail.com"},
-// }
-
 type server struct {
 	contacts []Contact
 	db       *sql.DB
