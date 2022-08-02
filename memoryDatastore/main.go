@@ -13,9 +13,9 @@ import (
 )
 
 type Contact struct {
-	ID   string `json:"ID"`
-	Name string `json:"Name"`
-	Mail string `json:"Mail"`
+	id        string `json:"id"`
+	user_name string `json:"user_name"`
+	mail      string `json:"mail"`
 }
 
 type server struct {
@@ -25,7 +25,7 @@ type server struct {
 
 func main() {
 
-	db, err := sql.Open("mysql", "root:123456@tcp(127.0.01:3308)/testapp")
+	db, err := sql.Open("mysql", "root:123456@tcp(127.0.01:3306)/aiggato")
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +63,7 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 
 	var contacts []Contact
 
-	result, err := s.db.Query("select * from Contacts")
+	result, err := s.db.Query("SELECT * FROM contacts;")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -72,7 +72,7 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 
 	for result.Next() {
 		var contact Contact
-		err := result.Scan(&contact.ID, &contact.Name, &contact.Mail)
+		err := result.Scan(&contact.id, &contact.user_name, &contact.mail)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -84,7 +84,7 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	result, err := s.db.Query("select * from Contacts where ID=?", params["id"])
+	result, err := s.db.Query("select * from contacts where id=?", params["id"])
 	if err != nil {
 		panic(err.Error())
 	}
@@ -92,7 +92,7 @@ func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 
 	var contact Contact
 	for result.Next() {
-		err := result.Scan(&contact.ID, &contact.Name, &contact.Mail)
+		err := result.Scan(&contact.id, &contact.user_name, &contact.mail)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -102,7 +102,7 @@ func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
-	query, err := s.db.Prepare("insert into Contacts (ID, Name, Mail) VALUES(?,?,?) ")
+	query, err := s.db.Prepare("insert into contacts (id, user_name, mail) VALUES(?,?,?) ")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -114,10 +114,10 @@ func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
 
 	keyVal := make(map[string]string)
 	json.Unmarshal(body, &keyVal)
-	ID := keyVal["ID"]
-	Name := keyVal["Name"]
-	Mail := keyVal["Mail"]
-	_, err = query.Exec(ID, Name, Mail)
+	id := keyVal["id"]
+	user_name := keyVal["user_name"]
+	mail := keyVal["mail"]
+	_, err = query.Exec(id, user_name, mail)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -127,7 +127,7 @@ func (s *server) createContact(w http.ResponseWriter, r *http.Request) {
 func (s *server) updateContact(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	query, err := s.db.Prepare("update Contacts set Mail = ? where ID =?")
+	query, err := s.db.Prepare("update contacts set mail = ?, user_name = ? where id =?")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -139,18 +139,19 @@ func (s *server) updateContact(w http.ResponseWriter, r *http.Request) {
 
 	keyVal := make(map[string]string)
 	json.Unmarshal(body, &keyVal)
-	newMail := keyVal["Mail"]
-	_, err = query.Exec(newMail, params["id"])
+	newMail := keyVal["mail"]
+	newName := keyVal["user_name"]
+	_, err = query.Exec(newMail, newName, params["id"])
 	if err != nil {
 		panic(err.Error())
 	}
-	fmt.Fprintf(w, "Contact with ID = %s was updated", params["id"])
+	fmt.Fprintf(w, "contact with id = %s was updated", params["id"])
 }
 
 func (s *server) deleteContact(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	query, err := s.db.Prepare("delete from Contacts where id = ?")
+	query, err := s.db.Prepare("delete from contacts where id = ?")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -160,5 +161,5 @@ func (s *server) deleteContact(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
-	fmt.Fprintf(w, "Post with ID = %s was deleted", params["id"])
+	fmt.Fprintf(w, "contact with id = %s was deleted", params["id"])
 }
