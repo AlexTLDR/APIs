@@ -17,7 +17,7 @@ In order to test SQL querys, I did the below steps:
 - create a directory and a docker-compose.yml file
 
 mkdir db-docker
-cd db-docker
+cd db-dockergo run main 
 touch docker-compose.yml
 
 - add the below in the docker-compose.yml file (image: to add the desired version of mysql -> https://hub.docker.com/_/mysql)
@@ -41,3 +41,7 @@ docker-compose up
 - to check the status (if the container is running)
 
 docker-compose ps
+
+mysql]$ docker run -d -p 3306:3306 --name aiggato-sql \ -e MYSQL_ROOT_PASSWORD=123456 aiggato-sql
+
+docker build -t aiggato-sql .
