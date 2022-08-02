@@ -63,7 +63,7 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 
 	var contacts []Contact
 
-	result, err := s.db.Query("SELECT * FROM contacts;")
+	result, err := s.db.Query("SELECT id, user_name, mail FROM contacts;")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -84,7 +84,7 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	result, err := s.db.Query("select * from contacts where id=?", params["id"])
+	result, err := s.db.Query("SELECT id, user_name, mail FROM where id=?", params["id"])
 	if err != nil {
 		panic(err.Error())
 	}
