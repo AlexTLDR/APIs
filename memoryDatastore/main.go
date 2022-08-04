@@ -13,9 +13,9 @@ import (
 )
 
 type Contact struct {
-	id        string `json:"id"`
-	user_name string `json:"user_name"`
-	mail      string `json:"mail"`
+	Id        string `json:"id"`
+	User_name string `json:"user_name"`
+	Mail      string `json:"mail"`
 }
 
 type server struct {
@@ -72,7 +72,7 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 
 	for result.Next() {
 		var contact Contact
-		err := result.Scan(&contact.id, &contact.user_name, &contact.mail)
+		err := result.Scan(&contact.Id, &contact.User_name, &contact.Mail)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -84,7 +84,7 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	result, err := s.db.Query("SELECT id, user_name, mail FROM where id=?", params["id"])
+	result, err := s.db.Query("SELECT id, user_name, mail FROM contacts where id=?", params["id"])
 	if err != nil {
 		panic(err.Error())
 	}
@@ -92,7 +92,7 @@ func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
 
 	var contact Contact
 	for result.Next() {
-		err := result.Scan(&contact.id, &contact.user_name, &contact.mail)
+		err := result.Scan(&contact.Id, &contact.User_name, &contact.Mail)
 		if err != nil {
 			panic(err.Error())
 		}
