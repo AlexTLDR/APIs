@@ -77,8 +77,9 @@ func (s *server) getAllContacts(w http.ResponseWriter, r *http.Request) {
 			panic(err.Error())
 		}
 		contacts = append(contacts, contact)
-		json.NewEncoder(w).Encode(contacts)
+		log.Println(contacts)
 	}
+	json.NewEncoder(w).Encode(contacts)
 }
 
 func (s *server) getContact(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +157,18 @@ func (s *server) deleteContact(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
-	_, err = query.Exec(params["id"])
+	result, err := query.Exec(params["id"])
+	if err != nil {
+		panic(err.Error())
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if rowsAffected != 1 {
+		http.Error(w, "can't delete id", 500)
+		fmt.Fprintf(w, "could not delete contact with id = %s\n", params["id"])
+		return
+	}
+
 	if err != nil {
 		panic(err.Error())
 	}
