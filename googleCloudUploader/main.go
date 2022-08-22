@@ -7,7 +7,6 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
-	"os"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -26,27 +25,24 @@ type ClientUploader struct {
 	uploadPath string
 }
 
-var uploader *ClientUploader
+func main() {
 
-func init() {
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/alex/Keys/GoogleCloud/aiggato/aiggato-upload-18942db9665f.json") // the path to the connection json
+	//os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/alex/Keys/GoogleCloud/aiggato/aiggato-upload-18942db9665f.json") // the path to the connection json
+
 	client, err := storage.NewClient(context.Background())
 	fmt.Println(client)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	uploader = &ClientUploader{
+	uploader := &ClientUploader{
 		cl:         client,
 		bucketName: bucketName,
 		projectID:  projectID,
 		uploadPath: "upload-files/", // the path of the files in the bucket
 	}
 
-}
-
-func main() {
-	r := gin.Default()
+	r := gin.Default() // create a function
 	r.POST("/upload", func(c *gin.Context) {
 		f, err := c.FormFile("file-input") //the name of the form
 		if err != nil {
