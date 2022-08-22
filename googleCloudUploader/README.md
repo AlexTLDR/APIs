@@ -1,6 +1,6 @@
 This is a simple API for Go to write files in Google Cloud buckets. In order to test it, follow the instructions.
 
-1. Create Google Cloud Storage Bucket:
+1. Create Google Cloud Storage Bucket
 
 - https://cloud.google.com/storage/docs/creating-buckets
 
@@ -16,3 +16,8 @@ This is a simple API for Go to write files in Google Cloud buckets. In order to 
 4. Check the uploaded file in the Google bucket
 
 https://console.cloud.google.com/storage 
+
+5. Run the program
+
+- run the program by adding the os variable in the command so the same program can be used on multiple machines/environments 
+-> GOOGLE_APPLICATION_CREDENTIALS="/home/alex/Keys/GoogleCloud/aiggato/aiggato-upload-18942db9665f.json" go run main.go
