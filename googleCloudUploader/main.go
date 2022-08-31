@@ -74,7 +74,7 @@ func main() {
 		})
 	})
 
-	r.Run() // listen and serve "localhost:8080"
+	r.Run(":8082") // listen and serve "localhost:8082"
 }
 
 // UploadFile uploads an object
