@@ -36,7 +36,7 @@ type server struct {
 }
 
 func main() {
-	/*sql start*/
+	/*sql connection*/
 	db, err := sql.Open("mysql", "root:123456@tcp(127.0.01:3306)/aiggato")
 	if err != nil {
 		panic(err)
@@ -59,7 +59,7 @@ func main() {
 
 	//log.Fatal(http.ListenAndServe(":8081", r))
 	go http.ListenAndServe(":8081", r)
-	/*sql end*/
+	/*gpc connection*/
 
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/alex/Keys/GoogleCloud/aiggato/aiggato-upload-18942db9665f.json") // the path to the connection json
 

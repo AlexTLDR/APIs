@@ -1,3 +1,4 @@
+For MySQL
 
 1. Install docker and configure a Dockerfile:
 
@@ -29,4 +30,32 @@ curl -X POST http://localhost:8081/api/contacts -d '{"id": "2","user_name": "Tes
 curl -X PUT http://localhost:8081/api/contacts/4 -d '{"id":"2","user_name":"TestID4Mod","mail":"test@id4.com"}' 
 
 curl -X DELETE http://localhost:8081/api/contacts/4 | jq 
+
+For GCP
+
+1. Create Google Cloud Storage Bucket
+
+- https://cloud.google.com/storage/docs/creating-buckets
+
+2. Generate the service account
+
+- https://cloud.google.com/storage/docs/reference/libraries#client-libraries-install-go for details, and choose “Create Service Account Key”
+
+3. Conduct testing to upload a file using the API
+
+- I used Postman for testing. Configure the POST command with http://localhost:8082/upload
+- Under the Body tab, select form-data and under KEY add file-input (the name of the c.FormFile) and under the VALUE, browse for the file to be uploaded
+
+4. Check the uploaded file in the Google bucket
+
+https://console.cloud.google.com/storage 
+
+5. Run the program
+
+- run the program by adding the os variable in the command so the same program can be used on multiple machines/environments 
+as os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "/home/alex/Keys/GoogleCloud/aiggato/aiggato-upload-18942db9665f.json") should be removed
+from the main.go file.
+
+-> GOOGLE_APPLICATION_CREDENTIALS="/home/alex/Keys/GoogleCloud/aiggato/aiggato-upload-18942db9665f.json" go run . 
+
 
