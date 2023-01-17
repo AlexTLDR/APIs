@@ -10,7 +10,8 @@ This is a simple API for Go to write files in Google Cloud buckets. In order to 
 
 3. Conduct testing to upload a file using the API
 
-- I used Postman for testing. Configure the POST command with http://localhost:8080/upload
+- I used Postman for testing. Configure the POST command with http://localhost:8082/upload (check in the code for r.Run(":80**")) or in the terminal for
+something like [GIN-debug] Listening and serving HTTP on :8082 to get the correct port.
 - Under the Body tab, select form-data and under KEY add file-input (the name of the c.FormFile) and under the VALUE, browse for the file to be uploaded
 
 4. Check the uploaded file in the Google bucket
