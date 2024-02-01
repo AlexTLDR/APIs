@@ -11,3 +11,33 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+  # TODO sslmode=enabled for prod
+  authentication-service:
+    build:
+      context: ./../authentication-service
+      dockerfile: ./../authentication-service/authentication-service.dockerfile
+    restart: always
+    ports:
+      - "9091:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres port=5432 user=rick password=morty dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+
+
+
+  postgres:
+    image: 'postgres:latest'
+    ports:
+      - "5432:5432"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: rick
+      POSTGRES_PASSWORD: morty
+      POSTGRES_DB: users
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
