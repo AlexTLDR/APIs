@@ -56,7 +56,7 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 		return err
 	}
 
-	server := mail.NewSMTPClient
+	server := mail.NewSMTPClient()
 	server.Host = m.Host
 	server.Port = m.Port
 	server.Username = m.Username
@@ -79,7 +79,7 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 
 	if len(msg.Attachments) > 0 {
 		for _, x := range msg.Attachments {
-			email.AddAttachments(x)
+			email.AddAttachment(x)
 		}
 	}
 
