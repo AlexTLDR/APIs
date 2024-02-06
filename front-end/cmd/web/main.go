@@ -13,7 +13,7 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		render(w, "test.page.gohtml")
 	})
-	port := ":9090"
+	port := ":7070"
 	portInt, err := strconv.Atoi(strings.Trim(port, ":"))
 	if err != nil {
 		log.Panic(err)
