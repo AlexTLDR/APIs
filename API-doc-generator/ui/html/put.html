@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>PUT /users/{id}</h2>
+<h3>Example: curl -X PUT -d '{"Name":"John Doe","Email":"johndoe@example.com"}' http://localhost:3000/users/1</h3>
+<form id="put-user-form">
+  <label for="id">ID:</label><br>
+  <input type="text" id="id" name="id"><br>
+  <label for="name">Name:</label><br>
+  <input type="text" id="name" name="name"><br>
+  <label for="email">Email:</label><br>
+  <input type="text" id="email" name="email"><br>
+  <input type="submit" value="Submit">
+</form> 
+
+<script>
+document.getElementById('put-user-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var id = document.getElementById('id').value;
+  var name = document.getElementById('name').value;
+  var email = document.getElementById('email').value;
+  fetch('/users/' + id, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({Name: name, Email: email})
+  })
+  .then(response => {
+    if (!response.ok) {
+      // If the server responds with an error status code, throw an error
+      return response.text().then(text => { throw new Error(text); });
+    }
+    return response.json();
+  })
+  .then(data => {
+    // Display the updated user details
+    alert('User updated successfully: ' + JSON.stringify(data));
+  })
+  .catch(error => {
+    // Display the error message
+    alert(error);
+  });
+});
+</script>
+
+<div id="footer"></div>
+
+<script>
+// Function to load the footer
+function loadFooter() {
+  fetch('/footer.html')
+    .then(response => response.text())
+    .then(footer => {
+      document.getElementById('footer').innerHTML = footer;
+      // Find the script tag in the footer and execute it
+      var script = document.getElementById('footer').querySelector('script');
+      eval(script.textContent);
+    })
+    .catch(error => {
+      console.error('Error:', error); // Log any errors
+    });
+}
+
+// Load the footer when the page is loaded
+loadFooter();
+
+// Auto-refresh the footer every 5 seconds
+setInterval(loadFooter, 5000);
+</script>
+
+</body>
+</html>

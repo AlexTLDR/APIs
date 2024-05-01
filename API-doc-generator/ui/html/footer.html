@@ -1,0 +1,16 @@
+<div id="users-table">
+</div>
+
+<script>
+// Fetch all users and display them in a table
+fetch('/users/all')
+  .then(response => response.json())
+  .then(users => {
+    var table = '<table><tr><th>ID</th><th>Name</th><th>Email</th></tr>';
+    users.forEach(user => {
+      table += '<tr><td>' + user.id + '</td><td>' + user.name + '</td><td>' + user.email + '</td></tr>';
+    });
+    table += '</table>';
+    document.getElementById('users-table').innerHTML = table;
+  });
+</script>

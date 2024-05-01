@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>GET /users/{id}</h2>
+<form id="get-user-form" action="/users" method="get">
+  <label for="id">ID:</label><br>
+  <input type="text" id="id" name="id"><br>
+  <input type="submit" value="Submit">
+</form> 
+
+<script>
+document.getElementById('get-user-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var id = document.getElementById('id').value;
+  window.location.href = '/users/' + id;
+});
+</script>
+
+<div id="footer"></div>
+
+<script>
+// Function to load the footer
+function loadFooter() {
+  fetch('/footer.html')
+    .then(response => response.text())
+    .then(footer => {
+      document.getElementById('footer').innerHTML = footer;
+      // Find the script tag in the footer and execute it
+      var script = document.getElementById('footer').querySelector('script');
+      eval(script.textContent);
+    })
+    .catch(error => {
+      console.error('Error:', error); // Log any errors
+    });
+}
+
+// Load the footer when the page is loaded
+loadFooter();
+
+// Auto-refresh the footer every 5 seconds
+setInterval(loadFooter, 5000);
+</script>
+
+</body>
+</html>
