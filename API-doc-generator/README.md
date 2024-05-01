@@ -1,5 +1,3 @@
-Hello!
-
 I am using godoc to generate the documentation and I have also added small html files to be able to test the APIs from the doc:
 
 ![alt text](godoc.png)
